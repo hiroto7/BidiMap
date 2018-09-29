@@ -56,7 +56,7 @@ export class BidiMap<K, V> implements ReadonlyBidiMap<K, V>, Map<K, V> {
 
   get size(): number {
     return this.xToY.size;
-  };
+  }
 
   readonly [Symbol.toStringTag]: 'Map' = 'Map';
 
