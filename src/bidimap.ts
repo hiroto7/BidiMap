@@ -26,7 +26,9 @@ export class BidiMap<K, V> implements ReadonlyBidiMap<K, V>, Map<K, V> {
   }
 
   delete(key: K): boolean {
-    return false;
+    const value = this.xToY.get(key);
+    if (this.yToX.get(value!) === key) this.yToX.delete(value!);
+    return this.xToY.delete(key);
   }
 
   forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void {

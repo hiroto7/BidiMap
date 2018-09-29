@@ -125,7 +125,10 @@ class BidiMap {
         this.yToX.clear();
     }
     delete(key) {
-        return false;
+        const value = this.xToY.get(key);
+        if (this.yToX.get(value) === key)
+            this.yToX.delete(value);
+        return this.xToY.delete(key);
     }
     forEach(callbackfn, thisArg) {
         this.forEach(callbackfn, thisArg);
