@@ -1,5 +1,6 @@
 export interface ReadonlyBidiMap<K, V> extends ReadonlyMap<K, V> {
   inverse(): ReadonlyMap<V, K>;
+  dedupe(): BidiMap<K, V>;
 }
 
 export class BidiMap<K, V> implements ReadonlyBidiMap<K, V>, Map<K, V> {
@@ -11,13 +12,17 @@ export class BidiMap<K, V> implements ReadonlyBidiMap<K, V>, Map<K, V> {
     this.yToX = new Map<V, K>();
     if (entries !== null && entries !== undefined) {
       for (const [key, value] of entries) {
-        this.set(key, value)
+        this.set(key, value);
       }
     }
   }
 
   inverse(): BidiMap<V, K> {
     return new BidiMap<V, K>(this.yToX);
+  }
+
+  dedupe(): BidiMap<K, V> {
+    return this.inverse().inverse();
   }
 
   clear(): void {
