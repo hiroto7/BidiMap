@@ -1,9 +1,16 @@
 export interface ReadonlyBidiMap<K, V> extends ReadonlyMap<K, V> {
-  inverse(): ReadonlyMap<V, K>;
-  dedupe(): BidiMap<K, V>;
+  inverse(): ReadonlyBidiMap<V, K>;
+  dedupe(): ReadonlyBidiMap<K, V>;
+  forEach(callbackfn: (value: V, key: K, map: ReadonlyBidiMap<K, V>) => void, thisArg?: any): void;
 }
 
-export class BidiMap<K, V> implements ReadonlyBidiMap<K, V>, Map<K, V> {
+export interface BidiMap<K, V> extends ReadonlyBidiMap<K, V>, Map<K, V> {
+  inverse(): BidiMap<V, K>;
+  dedupe(): BidiMap<K, V>;
+  forEach(callbackfn: (value: V, key: K, map: BidiMap<K, V>) => void, thisArg?: any): void;
+}
+
+export class DualBidiMap<K, V> implements BidiMap<K, V> {
   private xToY: Map<K, V>;
   private yToX: Map<V, K>;
 
@@ -17,11 +24,11 @@ export class BidiMap<K, V> implements ReadonlyBidiMap<K, V>, Map<K, V> {
     }
   }
 
-  inverse(): BidiMap<V, K> {
-    return new BidiMap<V, K>(this.yToX);
+  inverse(): DualBidiMap<V, K> {
+    return new DualBidiMap<V, K>(this.yToX);
   }
 
-  dedupe(): BidiMap<K, V> {
+  dedupe(): DualBidiMap<K, V> {
     return this.inverse().inverse();
   }
 
@@ -40,7 +47,7 @@ export class BidiMap<K, V> implements ReadonlyBidiMap<K, V>, Map<K, V> {
     return this.xToY.delete(key);
   }
 
-  forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void {
+  forEach(callbackfn: (value: V, key: K, map: DualBidiMap<K, V>) => void, thisArg?: any): void {
     this.forEach(callbackfn, thisArg);
   }
 
