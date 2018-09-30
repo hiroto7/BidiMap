@@ -1,1 +1,1 @@
-export { ReadonlyBidiMap, BidiMap } from './bidimap';
+export { ReadonlyBidiMap, BidiMap, DualBidiMap } from './bidimap';
