@@ -24,11 +24,11 @@ export class DualBidiMap<K, V> implements BidiMap<K, V> {
     }
   }
 
-  inverse(): DualBidiMap<V, K> {
+  inverse(): BidiMap<V, K> {
     return new DualBidiMap<V, K>(this.yToX);
   }
 
-  dedupe(): DualBidiMap<K, V> {
+  dedupe(): BidiMap<K, V> {
     return this.inverse().inverse();
   }
 
@@ -47,7 +47,7 @@ export class DualBidiMap<K, V> implements BidiMap<K, V> {
     return this.xToY.delete(key);
   }
 
-  forEach(callbackfn: (value: V, key: K, map: DualBidiMap<K, V>) => void, thisArg?: any): void {
+  forEach(callbackfn: (value: V, key: K, map: BidiMap<K, V>) => void, thisArg?: any): void {
     this.forEach(callbackfn, thisArg);
   }
 

@@ -12,11 +12,11 @@ export declare class DualBidiMap<K, V> implements BidiMap<K, V> {
     private xToY;
     private yToX;
     constructor(entries?: Iterable<[K, V]> | null);
-    inverse(): DualBidiMap<V, K>;
-    dedupe(): DualBidiMap<K, V>;
+    inverse(): BidiMap<V, K>;
+    dedupe(): BidiMap<K, V>;
     clear(): void;
     delete(key: K): boolean;
-    forEach(callbackfn: (value: V, key: K, map: DualBidiMap<K, V>) => void, thisArg?: any): void;
+    forEach(callbackfn: (value: V, key: K, map: BidiMap<K, V>) => void, thisArg?: any): void;
     get(key: K): V | undefined;
     has(key: K): boolean;
     set(key: K, value: V): this;
