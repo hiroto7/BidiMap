@@ -1,35 +1,44 @@
 export interface ReadonlyBidiMap<K, V> extends ReadonlyMap<K, V> {
-  inverse(): ReadonlyBidiMap<V, K>;
+  readonly inverse: ReadonlyBidiMap<V, K>;
   dedupe(): ReadonlyBidiMap<K, V>;
   forEach(callbackfn: (value: V, key: K, map: ReadonlyBidiMap<K, V>) => void, thisArg?: any): void;
 }
 
 export interface BidiMap<K, V> extends ReadonlyBidiMap<K, V>, Map<K, V> {
-  inverse(): BidiMap<V, K>;
+  readonly inverse: BidiMap<V, K>;
   dedupe(): BidiMap<K, V>;
   forEach(callbackfn: (value: V, key: K, map: BidiMap<K, V>) => void, thisArg?: any): void;
 }
 
 export class DualBidiMap<K, V> implements BidiMap<K, V> {
-  private xToY: Map<K, V>;
-  private yToX: Map<V, K>;
+  private static readonly inverseFlag = Symbol('inverse');
+  private readonly xToY: Map<K, V>;
+  private readonly yToX: Map<V, K>;
+  readonly inverse: BidiMap<V, K>;
 
-  constructor(entries?: Iterable<[K, V]> | null) {
-    this.xToY = new Map<K, V>();
-    this.yToX = new Map<V, K>();
-    if (entries !== null && entries !== undefined) {
-      for (const [key, value] of entries) {
-        this.set(key, value);
+  constructor(entries?: Iterable<[K, V]> | null);
+  constructor(inverse: DualBidiMap<V, K>, inverseFlag: symbol);
+  constructor(entries?: Iterable<[K, V]> | null, inverseFlag?: symbol) {
+    if (entries instanceof DualBidiMap && inverseFlag === DualBidiMap.inverseFlag) {
+      const inverse: DualBidiMap<V, K> = entries;
+      this.xToY = inverse.yToX;
+      this.yToX = inverse.xToY;
+      this.inverse = inverse;
+    } else {
+      this.xToY = new Map<K, V>();
+      this.yToX = new Map<V, K>();
+      if (entries !== null && entries !== undefined) {
+        for (const [key, value] of entries) {
+          this.set(key, value);
+        }
       }
+      this.inverse = new DualBidiMap<V, K>(this, DualBidiMap.inverseFlag);
     }
   }
 
-  inverse(): BidiMap<V, K> {
-    return new DualBidiMap<V, K>(this.yToX);
-  }
-
   dedupe(): BidiMap<K, V> {
-    return this.inverse().inverse();
+    const inverseLike: DualBidiMap<V, K> = new DualBidiMap<V, K>(this.yToX);
+    return new DualBidiMap<K, V>(inverseLike.yToX);
   }
 
   clear(): void {

@@ -1,18 +1,20 @@
 export interface ReadonlyBidiMap<K, V> extends ReadonlyMap<K, V> {
-    inverse(): ReadonlyBidiMap<V, K>;
+    readonly inverse: ReadonlyBidiMap<V, K>;
     dedupe(): ReadonlyBidiMap<K, V>;
     forEach(callbackfn: (value: V, key: K, map: ReadonlyBidiMap<K, V>) => void, thisArg?: any): void;
 }
 export interface BidiMap<K, V> extends ReadonlyBidiMap<K, V>, Map<K, V> {
-    inverse(): BidiMap<V, K>;
+    readonly inverse: BidiMap<V, K>;
     dedupe(): BidiMap<K, V>;
     forEach(callbackfn: (value: V, key: K, map: BidiMap<K, V>) => void, thisArg?: any): void;
 }
 export declare class DualBidiMap<K, V> implements BidiMap<K, V> {
-    private xToY;
-    private yToX;
+    private static readonly inverseFlag;
+    private readonly xToY;
+    private readonly yToX;
+    readonly inverse: BidiMap<V, K>;
     constructor(entries?: Iterable<[K, V]> | null);
-    inverse(): BidiMap<V, K>;
+    constructor(inverse: DualBidiMap<V, K>, inverseFlag: symbol);
     dedupe(): BidiMap<K, V>;
     clear(): void;
     delete(key: K): boolean;
