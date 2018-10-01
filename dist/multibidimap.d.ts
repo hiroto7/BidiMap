@@ -22,8 +22,8 @@ export declare class DualMultiBidiMap<K, V> implements MultiBidiMap<K, V> {
     private readonly yToXs;
     readonly inverse: MultiBidiMap<V, K>;
     constructor(entries?: Iterable<[K, V]> | null);
-    constructor(inverse: DualMultiBidiMap<V, K>, inverseFlag: symbol);
     constructor(bidimap: BidiMap<K, V>, xToYs: Map<K, Set<V>>, yToXs: Map<V, Set<K>>, privateFlag: symbol);
+    constructor(inverse: DualMultiBidiMap<V, K>, inverseFlag: symbol);
     delete(key: K, value?: V): boolean;
     hasAny(key: K): boolean;
     has(key: K, value?: V): boolean;

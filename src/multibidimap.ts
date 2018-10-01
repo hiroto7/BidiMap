@@ -26,26 +26,26 @@ export class DualMultiBidiMap<K, V> implements MultiBidiMap<K, V> {
   readonly inverse: MultiBidiMap<V, K>;
 
   constructor(entries?: Iterable<[K, V]> | null);
-  constructor(inverse: DualMultiBidiMap<V, K>, inverseFlag: symbol);
   constructor(bidimap: BidiMap<K, V>, xToYs: Map<K, Set<V>>, yToXs: Map<V, Set<K>>, privateFlag: symbol);
+  constructor(inverse: DualMultiBidiMap<V, K>, inverseFlag: symbol);
   constructor(entries?: Iterable<[K, V]> | null, ...args: any[]) {
-    if (entries instanceof DualBidiMap &&
-      args[1] instanceof Map && args[2] instanceof Map &&
-      args[3] === DualMultiBidiMap.privateFlag) {
-      const bidimap: BidiMap<K, V> = entries;
-      const xToYs: Map<K, Set<V>> = args[1];
-      const yToXs: Map<V, Set<K>> = args[2];
-      this.bidimap = bidimap;
-      this.xToYs = xToYs;
-      this.yToXs = yToXs;
-      this.inverse = new DualMultiBidiMap<V, K>(this, DualMultiBidiMap.inverseFlag);
-
-    } else if (entries instanceof DualMultiBidiMap && args[1] === DualMultiBidiMap.inverseFlag) {
+    if (entries instanceof DualMultiBidiMap && args[0] === DualMultiBidiMap.inverseFlag) {
       const inverse: DualMultiBidiMap<V, K> = entries;
       this.bidimap = inverse.bidimap.inverse;
       this.xToYs = inverse.yToXs;
       this.yToXs = inverse.xToYs;
       this.inverse = inverse;
+
+    } else if (entries instanceof DualBidiMap &&
+      args[0] instanceof Map && args[1] instanceof Map &&
+      args[2] === DualMultiBidiMap.privateFlag) {
+      const bidimap: BidiMap<K, V> = entries;
+      const xToYs: Map<K, Set<V>> = args[0];
+      const yToXs: Map<V, Set<K>> = args[1];
+      this.bidimap = bidimap;
+      this.xToYs = xToYs;
+      this.yToXs = yToXs;
+      this.inverse = new DualMultiBidiMap<V, K>(this, DualMultiBidiMap.inverseFlag);
 
     } else {
       this.bidimap = new DualBidiMap();
