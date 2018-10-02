@@ -24,6 +24,7 @@ export declare class DualMultiBidiMap<K, V> implements MultiBidiMap<K, V> {
     constructor(entries?: Iterable<[K, V]> | null);
     constructor(bidimap: BidiMap<K, V>, xToYs: Map<K, Set<V>>, yToXs: Map<V, Set<K>>, privateFlag: symbol);
     constructor(inverse: DualMultiBidiMap<V, K>, inverseFlag: symbol);
+    private static deleteAMAP;
     delete(key: K, value?: V): boolean;
     hasAny(key: K): boolean;
     has(key: K, value?: V): boolean;
@@ -32,6 +33,7 @@ export declare class DualMultiBidiMap<K, V> implements MultiBidiMap<K, V> {
     clear(): void;
     forEach(callbackfn: (value: V, key: K, map: MultiBidiMap<K, V>) => void, thisArg?: any): void;
     get(key: K): V | undefined;
+    private static addSafely;
     set(key: K, value: V): this;
     readonly size: number;
     readonly [Symbol.toStringTag]: 'Map';

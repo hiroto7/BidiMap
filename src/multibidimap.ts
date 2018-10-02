@@ -36,42 +36,44 @@ export class DualMultiBidiMap<K, V> implements MultiBidiMap<K, V> {
       this.yToXs = inverse.xToYs;
       this.inverse = inverse;
 
-    } else if (entries instanceof DualBidiMap &&
-      args[0] instanceof Map && args[1] instanceof Map &&
-      args[2] === DualMultiBidiMap.privateFlag) {
-      const bidimap: BidiMap<K, V> = entries;
-      const xToYs: Map<K, Set<V>> = args[0];
-      const yToXs: Map<V, Set<K>> = args[1];
-      this.bidimap = bidimap;
-      this.xToYs = xToYs;
-      this.yToXs = yToXs;
-      this.inverse = new DualMultiBidiMap<V, K>(this, DualMultiBidiMap.inverseFlag);
-
     } else {
-      this.bidimap = new DualBidiMap();
-      this.xToYs = new Map<K, Set<V>>();
-      this.yToXs = new Map<V, Set<K>>();
-      if (entries !== null && entries !== undefined) {
-        for (const [key, value] of entries) {
-          this.set(key, value);
+      if (entries instanceof DualBidiMap &&
+        args[0] instanceof Map && args[1] instanceof Map &&
+        args[2] === DualMultiBidiMap.privateFlag) {
+        const bidimap: BidiMap<K, V> = entries;
+        const xToYs: Map<K, Set<V>> = args[0];
+        const yToXs: Map<V, Set<K>> = args[1];
+        this.bidimap = bidimap;
+        this.xToYs = xToYs;
+        this.yToXs = yToXs;
+
+      } else {
+        this.bidimap = new DualBidiMap();
+        this.xToYs = new Map<K, Set<V>>();
+        this.yToXs = new Map<V, Set<K>>();
+        if (entries !== null && entries !== undefined) {
+          for (const [key, value] of entries) {
+            this.set(key, value);
+          }
         }
       }
+
       this.inverse = new DualMultiBidiMap<V, K>(this, DualMultiBidiMap.inverseFlag);
+    }
+  }
+
+  private static deleteAMAP<K, V>(map: Map<K, Set<V>>, key: K, value: V, values0?: Set<V>) {
+    if (map.has(key)) {
+      const values: Set<V> = values0 || map.get(key)!;
+      values.delete(value);
+      if (values.size === 0) {
+        map.delete(key);
+      }
     }
   }
 
   delete(key: K, value?: V): boolean;
   delete(...args: [K, V?]): boolean {
-    function deleteAMAP<K, V>(map: Map<K, Set<V>>, key: K, value: V, values0?: Set<V>) {
-      if (map.has(key)) {
-        const values: Set<V> = values0 || map.get(key)!;
-        values.delete(value);
-        if (values.size === 0) {
-          map.delete(key);
-        }
-      }
-    }
-
     const key: K = args[0];
 
     switch (args.length) {
@@ -80,8 +82,8 @@ export class DualMultiBidiMap<K, V> implements MultiBidiMap<K, V> {
           const values: Set<V> = this.xToYs.get(key)!;
           for (const value of values) {
             if (values.has(value) && this.yToXs.has(value)) {
-              deleteAMAP(this.xToYs, key, value, values);
-              deleteAMAP(this.yToXs, value, key);
+              DualMultiBidiMap.deleteAMAP(this.xToYs, key, value, values);
+              DualMultiBidiMap.deleteAMAP(this.yToXs, value, key);
             }
           }
         }
@@ -95,8 +97,8 @@ export class DualMultiBidiMap<K, V> implements MultiBidiMap<K, V> {
           }
           const values: Set<V> = this.xToYs.get(key)!;
           if (values.has(value) && this.yToXs.has(value)) {
-            deleteAMAP(this.xToYs, key, value, values);
-            deleteAMAP(this.yToXs, value, key);
+            DualMultiBidiMap.deleteAMAP(this.xToYs, key, value, values);
+            DualMultiBidiMap.deleteAMAP(this.yToXs, value, key);
             return true;
           } else {
             return false;
@@ -160,19 +162,19 @@ export class DualMultiBidiMap<K, V> implements MultiBidiMap<K, V> {
     return this.bidimap.get(key);
   }
 
-  set(key: K, value: V): this {
-    function addSafely<K, V>(map: Map<K, Set<V>>, key: K, value: V) {
-      if (map.has(key)) {
-        const values: Set<V> = map.get(key)!;
-        values.add(value);
-      } else {
-        map.set(key, new Set([value]));
-      }
+  private static addSafely<K, V>(map: Map<K, Set<V>>, key: K, value: V) {
+    if (map.has(key)) {
+      const values: Set<V> = map.get(key)!;
+      values.add(value);
+    } else {
+      map.set(key, new Set([value]));
     }
+  }
 
+  set(key: K, value: V): this {
     this.bidimap.set(key, value);
-    addSafely(this.xToYs, key, value);
-    addSafely(this.yToXs, value, key);
+    DualMultiBidiMap.addSafely(this.xToYs, key, value);
+    DualMultiBidiMap.addSafely(this.yToXs, value, key);
 
     return this;
   }
