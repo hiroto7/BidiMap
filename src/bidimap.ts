@@ -5,7 +5,7 @@ export interface ReadonlyBidiMap<K, V> extends ReadonlyMap<K, V> {
 }
 export namespace ReadonlyBidiMap {
   export function isReadonlyBidiMap<K, V>(iterable: Iterable<[K, V]> | any): iterable is ReadonlyBidiMap<K, V> {
-    return iterable instanceof DualBidiMap;
+    return iterable instanceof AbstractBidiMap;
   }
 }
 
@@ -14,52 +14,26 @@ export interface BidiMap<K, V> extends ReadonlyBidiMap<K, V>, Map<K, V> {
   dedupe(): BidiMap<K, V>;
   forEach(callbackfn: (value: V, key: K, map: BidiMap<K, V>) => void, thisArg?: any): void;
 }
-
-export class DualBidiMap<K, V> implements BidiMap<K, V> {
-  private static readonly inverseFlag = Symbol('inverse');
-  private readonly xToY: Map<K, V>;
-  private readonly yToX: Map<V, K>;
-  readonly inverse: BidiMap<V, K>;
-
-  static isDualBidiMap<K, V>(iterable: Iterable<[K, V]> | any): iterable is DualBidiMap<K, V> {
-    return iterable instanceof DualBidiMap;
+export namespace BidiMap {
+  export function isBidiMap<K, V>(iterable: Iterable<[K, V]> | any): iterable is BidiMap<K, V> {
+    return iterable instanceof AbstractBidiMap;
   }
+}
 
-  private static isInverse<K, V>(iterable: Iterable<[K, V]> | any, inverseFlag?: symbol): iterable is DualBidiMap<K, V> {
-    return DualBidiMap.isDualBidiMap<V, K>(iterable) && inverseFlag === DualBidiMap.inverseFlag
-  }
+abstract class AbstractBidiMap<K, V> implements BidiMap<K, V> {
+  protected abstract readonly xToY: Map<K, V>;
+  protected abstract readonly yToX: Map<V, K>;
 
-  constructor(entries?: Iterable<[K, V]> | null);
-  constructor(bidimap: ReadonlyBidiMap<K, V>);
-  constructor(inverse: DualBidiMap<V, K>, inverseFlag: symbol);
-  constructor(entries?: Iterable<[K, V]> | DualBidiMap<V, K> | null, inverseFlag?: symbol) {
-    if (DualBidiMap.isInverse<V, K>(entries, inverseFlag)) {
-      const inverse: DualBidiMap<V, K> = entries;
-      this.xToY = inverse.yToX;
-      this.yToX = inverse.xToY;
-      this.inverse = inverse;
+  abstract readonly inverse: BidiMap<V, K>;
+  readonly [Symbol.toStringTag]: 'Map' = 'Map';
 
-    } else {
-      if (ReadonlyBidiMap.isReadonlyBidiMap<K, V>(entries)) {
-        const bidimap: ReadonlyBidiMap<K, V> = entries;
-        this.xToY = new Map<K, V>(bidimap);
-        this.yToX = new Map<V, K>(bidimap.inverse);
-      } else {
-        this.xToY = new Map<K, V>();
-        this.yToX = new Map<V, K>();
-        if (entries !== null && entries !== undefined) {
-          for (const [key, value] of entries) {
-            this.set(key, value);
-          }
-        }
-      }
-      this.inverse = new DualBidiMap<V, K>(this, DualBidiMap.inverseFlag);
-    }
+  get size(): number {
+    return this.xToY.size;
   }
 
   dedupe(): BidiMap<K, V> {
-    const inverseLike: DualBidiMap<V, K> = new DualBidiMap<V, K>(this.yToX);
-    return new DualBidiMap<K, V>(inverseLike.yToX);
+    const inverseLike: BidiMap<V, K> = new DualBidiMap<V, K>(this.inverse);
+    return new DualBidiMap<K, V>(inverseLike.inverse);
   }
 
   clear(): void {
@@ -95,12 +69,6 @@ export class DualBidiMap<K, V> implements BidiMap<K, V> {
     return this;
   }
 
-  get size(): number {
-    return this.xToY.size;
-  }
-
-  readonly [Symbol.toStringTag]: 'Map' = 'Map';
-
   [Symbol.iterator](): IterableIterator<[K, V]> {
     return this.xToY[Symbol.iterator]();
   }
@@ -119,5 +87,41 @@ export class DualBidiMap<K, V> implements BidiMap<K, V> {
 
   toJSON(): any {
     return this.xToY.toJSON();
+  }
+}
+
+export class DualBidiMap<K, V> extends AbstractBidiMap<K, V> {
+  protected readonly xToY: Map<K, V>;
+  protected readonly yToX: Map<V, K>;
+  readonly inverse: BidiMap<V, K>;
+
+  constructor(entries?: Iterable<[K, V]> | null);
+  constructor(bidimap: ReadonlyBidiMap<K, V>);
+  constructor(entries?: Iterable<[K, V]> | ReadonlyBidiMap<K, V> | null) {
+    super();
+    if (ReadonlyBidiMap.isReadonlyBidiMap<K, V>(entries)) {
+      const bidimap: ReadonlyBidiMap<K, V> = entries;
+      this.xToY = new Map<K, V>(bidimap);
+      this.yToX = new Map<V, K>(bidimap.inverse);
+    } else {
+      this.xToY = new Map<K, V>();
+      this.yToX = new Map<V, K>();
+      if (entries !== null && entries !== undefined) {
+        for (const [key, value] of entries) {
+          this.set(key, value);
+        }
+      }
+    }
+    this.inverse = new InverseBidiMap<V, K>(this, this.yToX, this.xToY);
+  }
+}
+
+class InverseBidiMap<K, V> extends AbstractBidiMap<K, V> {
+  constructor(
+    readonly inverse: BidiMap<V, K>,
+    protected readonly xToY: Map<K, V>,
+    protected readonly yToX: Map<V, K>
+  ) {
+    super();
   }
 }
