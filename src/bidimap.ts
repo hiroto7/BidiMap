@@ -33,7 +33,7 @@ export class DualBidiMap<K, V> implements BidiMap<K, V> {
   constructor(bidimap: ReadonlyBidiMap<K, V>);
   constructor(inverse: DualBidiMap<V, K>, inverseFlag: symbol);
   constructor(entries?: Iterable<[K, V]> | DualBidiMap<V, K> | null, inverseFlag?: symbol) {
-    if (DualBidiMap.isInverse(entries, inverseFlag)) {
+    if (DualBidiMap.isInverse<V, K>(entries, inverseFlag)) {
       const inverse: DualBidiMap<V, K> = entries;
       this.xToY = inverse.yToX;
       this.yToX = inverse.xToY;
