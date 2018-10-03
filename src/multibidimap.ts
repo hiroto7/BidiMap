@@ -224,8 +224,19 @@ export class DualMultiBidiMap<K, V> extends AbstractMultiBidiMap<K, V> {
       this.xToYs = xToYs;
       this.yToXs = yToXs;
 
+    } else if (ReadonlyMultiBidiMap.isReadonlyMultiBidiMap<K, V>(entries)) {
+      const multibidimap: ReadonlyMultiBidiMap<K, V> = entries;
+      this.bidimap = new DualBidiMap<K, V>(multibidimap);
+      this.xToYs = new Map<K, Set<V>>();
+      for (const [key, values] of multibidimap.entriesAll()) {
+        this.xToYs.set(key, new Set<V>(values));
+      }
+      this.yToXs = new Map<V, Set<K>>();
+      for (const [value, keys] of multibidimap.inverse.entriesAll()) {
+        this.yToXs.set(value, new Set<K>(keys));
+      }
     } else {
-      this.bidimap = new DualBidiMap();
+      this.bidimap = new DualBidiMap<K, V>();
       this.xToYs = new Map<K, Set<V>>();
       this.yToXs = new Map<V, Set<K>>();
       if (entries !== null && entries !== undefined) {
