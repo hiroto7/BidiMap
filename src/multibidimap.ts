@@ -55,11 +55,9 @@ abstract class AbstractMultiBidiMap<K, V> implements MultiBidiMap<K, V> {
   }
 
   delete(key: K, value?: V): boolean;
-  delete(...args: [K, V?]): boolean {
-    const key: K = args[0];
-
+  delete(key: K, ...args: [V?]): boolean {
     switch (args.length) {
-      case 1:
+      case 0:
         if (this.xToYs.has(key)) {
           const values: Set<V> = this.xToYs.get(key)!;
           for (const value of values) {
@@ -71,8 +69,8 @@ abstract class AbstractMultiBidiMap<K, V> implements MultiBidiMap<K, V> {
         }
         return this.bidimap.delete(key);
 
-      case 2:
-        const value: V = args[1]!;
+      case 1:
+        const value: V = args[0]!;
         if (this.xToYs.has(key)) {
           if (this.bidimap.has(key) && this.bidimap.get(key) === value) {
             this.bidimap.delete(key);
@@ -97,15 +95,13 @@ abstract class AbstractMultiBidiMap<K, V> implements MultiBidiMap<K, V> {
   }
 
   has(key: K, value?: V): boolean;
-  has(...args: [K, V?]): boolean {
-    const key: K = args[0];
-
+  has(key: K, ...args: [V?]): boolean {
     switch (args.length) {
-      case 1:
+      case 0:
         return this.bidimap.has(key);
 
-      case 2:
-        const value: V = args[1]!;
+      case 1:
+        const value: V = args[0]!;
         if (this.xToYs.has(key)) {
           const values: Set<V> = this.xToYs.get(key)!;
           return values.has(value);
@@ -235,6 +231,7 @@ export class DualMultiBidiMap<K, V> extends AbstractMultiBidiMap<K, V> {
       for (const [value, keys] of multibidimap.inverse.entriesAll()) {
         this.yToXs.set(value, new Set<K>(keys));
       }
+
     } else {
       this.bidimap = new DualBidiMap<K, V>();
       this.xToYs = new Map<K, Set<V>>();
