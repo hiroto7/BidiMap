@@ -3,6 +3,7 @@ export interface ReadonlyMultiBidiMap<K, V> extends ReadonlyBidiMap<K, V> {
     hasAny(key: K): boolean;
     has(key: K, value?: V): boolean;
     getAll(key: K): IterableIterator<V>;
+    entriesAll(): IterableIterator<[K, IterableIterator<V>]>;
     readonly inverse: ReadonlyMultiBidiMap<V, K>;
     dedupe(): ReadonlyMultiBidiMap<K, V>;
     forEach(callbackfn: (value: V, key: K, map: ReadonlyMultiBidiMap<K, V>) => void, thisArg?: any): void;
@@ -33,6 +34,7 @@ declare abstract class AbstractMultiBidiMap<K, V> implements MultiBidiMap<K, V> 
     hasAny(key: K): boolean;
     has(key: K, value?: V): boolean;
     getAll(key: K): IterableIterator<V>;
+    entriesAll(): IterableIterator<[K, IterableIterator<V>]>;
     dedupe(): MultiBidiMap<K, V>;
     clear(): void;
     forEach(callbackfn: (value: V, key: K, map: MultiBidiMap<K, V>) => void, thisArg?: any): void;
