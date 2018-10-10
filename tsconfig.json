@@ -12,5 +12,8 @@
     "lib": [
       "es7"
     ]
-  }
+  },
+  "exclude": [
+    "samples"
+  ]
 }
