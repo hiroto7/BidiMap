@@ -1,3 +1,7 @@
+/**
+ * @param K キーの型
+ * @param V 値の型
+ */
 export interface ReadonlyBidiMap<K, V> extends ReadonlyMap<K, V> {
   readonly inverse: ReadonlyBidiMap<V, K>;
   dedupe(): ReadonlyBidiMap<K, V>;
