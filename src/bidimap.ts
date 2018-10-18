@@ -1,4 +1,6 @@
 /**
+ * `BidiMap`を読み取り専用にする型です。
+ * `ReadonlyBidiMap`は変更を与えるメソッドを持ちません。
  * @param K キーの型
  * @param V 値の型
  */
@@ -32,6 +34,10 @@ export namespace ReadonlyBidiMap {
 }
 
 /**
+ * キーから値、および値からキーへのマッピングを保持するマップです。
+ * `Map`ではキーから値を検索できますが、
+ * `BidiMap`では値からキーを検索することもできます。
+ * `inverse`プロパティにより逆方向のマップ（逆写像）にアクセスできます。
  * @param K キーの型
  * @param V 値の型
  */
@@ -165,6 +171,7 @@ abstract class AbstractBidiMap<K, V> implements BidiMap<K, V> {
 }
 
 /**
+ * `BidiMap`の実装です。
  * @param K キーの型
  * @param V 値の型
  */
