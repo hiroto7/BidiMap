@@ -180,7 +180,19 @@ export class DualBidiMap<K, V> extends AbstractBidiMap<K, V> {
   protected readonly yToX: Map<V, K>;
   readonly inverse: BidiMap<V, K>;
 
+  /**
+   * 新しい`DualBidiMap`を生成します。
+   * 第1引数が省略されるか`null`が渡された場合、空の`DualBidiMap`が生成されます。
+   * 第1引数に`Iterable<[K, V]>`（要素を「キーと値のタプル」とする配列、または`Iterable`オブジェクト）が渡された場合、
+   * すべてのキー・値のマッピングが新しい`DualBidiMap`に追加されます。
+   * @param entries 要素を「キーと値のタプル」とする配列、または`Iterable`オブジェクト
+   */
   constructor(entries?: Iterable<[K, V]> | null);
+  /**
+   * 第1引数に指定された`ReadonlyBidiMap`または`BidiMap`オブジェクトのコピーとなる、
+   * 新しい`DualBidiMap`を生成します。
+   * @param bidimap コピーされる`ReadonlyBidiMap`または`BidiMap`オブジェクト
+   */
   constructor(bidimap: ReadonlyBidiMap<K, V>);
   constructor(entries?: Iterable<[K, V]> | ReadonlyBidiMap<K, V> | null) {
     super();
