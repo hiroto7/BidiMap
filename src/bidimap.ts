@@ -189,8 +189,8 @@ export class DualBidiMap<K, V> extends AbstractBidiMap<K, V> {
    */
   constructor(entries?: Iterable<[K, V]> | null);
   /**
-   * 第1引数に指定された`ReadonlyBidiMap`または`BidiMap`オブジェクトのコピーとなる、
-   * 新しい`DualBidiMap`を生成します。
+   * 第1引数に指定された`ReadonlyBidiMap`または`BidiMap`オブジェクトのコピーとなる、新しい`DualBidiMap`を生成します。
+   * 逆方向のマップ（逆写像）`inverse`についてもコピーされます。
    * @param bidimap コピーされる`ReadonlyBidiMap`または`BidiMap`オブジェクト
    */
   constructor(bidimap: ReadonlyBidiMap<K, V>);
